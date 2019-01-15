@@ -1,0 +1,34 @@
+function c = fk3( c, x )
+%FK_TRANSFORM Summary of this function goes here
+%   Detailed explanation goes here
+
+l = c.l;
+a = c.a;
+d = c.d;
+
+c.pts = zeros(c.n+1, 4);
+
+% Transformation of joints
+c.H = zeros(4, 4, c.n+1);
+
+c.pts(1,:) = c.parent;
+t = eye(4);
+t(:,4) = c.parent;
+c.H(:,:,1) = t * c.pretransform;
+
+% Apply each transformation based on Denavit-Hartenberg
+for i = 1:c.n
+    %pts(i+1, :) = H(:, 4);
+    A = [cos(x(i)), -sin(x(i))*cos(a(i)),  sin(x(i))*sin(a(i)), l(i)*cos(x(i)); ...
+         sin(x(i)),  cos(x(i))*cos(a(i)), -cos(x(i))*sin(a(i)), l(i)*sin(x(i)); ...
+         0,          sin(a(i)),            cos(a(i)),           d(i); ...
+         0,          0,                    0,                   1];
+    c.H(:,:,i+1) = c.H(:,:,i) * A;
+    %pts(i+2,:) = H(:,4);
+    c.pts(i+1,:) = c.H(:,4,i+1);
+end
+
+%y = pts(i+2,:);
+
+end
+
